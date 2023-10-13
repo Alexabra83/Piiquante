@@ -96,3 +96,61 @@ exports.deleteSauce = (req, res, next) => {
       });
 };
 
+exports.likeDislikeSauce = (req, res, next) => {
+  const userId = req.body.userId;
+  const like = req.body.like;
+  const sauceId = req.params.id;
+  if (req.body.userId !== req.auth.userId){
+   return res.status(401).json({ message : 'Not authorized'});
+  }
+  if (like != -1 && like !=1 && like != 0){
+    return res.status(401).json({ message : "unknown action bad 'like' value"});
+  }
+  Sauce.findOne({_id: sauceId})
+      .then((sauce) => {
+        let newDislikesValue = sauce.dislikes;
+        let newLikesValue = sauce.likes;
+        let newUsersLikedValue = sauce.usersLiked;
+        let newUsersDislikedValue = sauce.usersDisliked;
+        if (like == -1){
+          const userIndex = sauce.usersDisliked.indexOf(userId)
+          if (userIndex > -1){
+            return res.status(401).json({ message : "can't dislike twice"});
+          }
+          newUsersDislikedValue.push(userId);
+          newDislikesValue++;
+        }else if (like == 1){
+          const userIndex = sauce.usersLiked.indexOf(userId)
+          if (userIndex > -1){
+            return res.status(401).json({ message : "can't like twice"});
+          }
+          newUsersLikedValue.push(userId);
+          newLikesValue++;
+        }else {
+          const userDislikeIndex = sauce.usersDisliked.indexOf(userId);
+          const userLikeIndex = sauce.usersLiked.indexOf(userId);
+          if (userDislikeIndex > 1){
+            newUsersDislikedValue.splice(userDislikeIndex, 1);
+            newDislikesValue--;
+          }else if(userLikeIndex > 1){
+            newUsersLikedValue.splice(userLikeIndex, 1);
+            newLikesValue--;
+          }else {
+            return res.status(401).json({ message : "can't remove dislike or like that don't exist"});
+          }
+        }
+        Sauce.updateOne({ _id: sauceId}, { 
+          ...sauce,
+          likes: newLikesValue,
+          dislikes: newDislikesValue,
+          usersDisliked: newUsersDislikedValue,
+          userLiked: newUsersLikedValue
+        })
+              .then(() => res.status(200).json({message : 'Objet modifié!'}))
+              .catch(error => res.status(401).json({ error }));
+      })
+      .catch((error) => {
+        console.log(error);
+          res.status(400).json({ error });
+      });
+};
