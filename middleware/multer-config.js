@@ -1,13 +1,11 @@
 const multer = require('multer');
 
-
 //type MIME pris en charge
 const MIME_TYPES = {
   'image/jpg': 'jpg',
   'image/jpeg': 'jpg',
   'image/png': 'png'
 };
-
 
 //gestion des fichiers images
 const storage = multer.diskStorage({

@@ -1,11 +1,9 @@
-//
-
 const express = require('express');
 const router = express.Router();
 
 const userCtrl = require('../controllers/user');
 
-// route pour la création d'utilisateur ou connection
+//Routes pour la création d'utilisateur ou connection
 router.post('/signup', userCtrl.signup);
 router.post('/login', userCtrl.login);
 
