@@ -122,22 +122,22 @@ exports.likeDislikeSauce = (req, res, next) => {
         }else {
           const userDislikeIndex = sauce.usersDisliked.indexOf(userId);
           const userLikeIndex = sauce.usersLiked.indexOf(userId);
-          if (userDislikeIndex > 1){    // Permet de retirer un dislike
+          if (userDislikeIndex > -1){    // Permet de retirer un dislike
             newUsersDislikedValue.splice(userDislikeIndex, 1);
             newDislikesValue--;
-          }else if(userLikeIndex > 1){    //Permet de retirer un like
+          }else if(userLikeIndex > -1){    //Permet de retirer un like
             newUsersLikedValue.splice(userLikeIndex, 1);
             newLikesValue--;
           }else {
             return res.status(400).json({ message : "can't remove dislike or like that don't exist"});
           }
         }
+        
         Sauce.updateOne({ _id: sauceId}, {    //Met à jour les informations de la sauce like/dislike
-          ...sauce,
           likes: newLikesValue,
           dislikes: newDislikesValue,
           usersDisliked: newUsersDislikedValue,
-          userLiked: newUsersLikedValue
+          usersLiked: newUsersLikedValue
         })
               .then(() => res.status(200).json({message : 'Objet modifié!'}))
               .catch(error => res.status(400).json({ error }));

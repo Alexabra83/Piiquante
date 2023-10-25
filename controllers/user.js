@@ -33,7 +33,7 @@ exports.login = (req, res, next) => {    //Cherche si l'utilisateur est déjà e
                   res.status(200).json({    //L'utilisateur a été trouvé
                       userId: user._id,
                       token: jwt.sign(
-                          { userId: user._id },
+                          { userId: user._id,},
                           process.env.JWT_KEY,    //Asigne un token qui donne accés aux autres routes
                           { expiresIn: '24h' }
                       )
